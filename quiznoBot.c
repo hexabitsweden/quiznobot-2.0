@@ -48,7 +48,7 @@
 
 //defines the default timeout in seconds
 #define DEFAULT_TIMEOUT 10
-#define COMMAND_TOKENS 50
+#define COMMAND_TOKENS 500
 
 enum CommandLineSettings
 {
@@ -587,7 +587,17 @@ void RunMainLoop()
 	char buffer[4096];
 	char **message;
    struct sigaction sa;
-	
+	struct timeval recvTimeout;
+   int bytesRecved = 0;
+   
+   //clear out the recvTimeout struct
+   memset(&recvTimeout, 0, sizeof(struct timeval));
+   //we'll timeout every 30 seconds so we can run thruogh the loop to announce
+   //in the channel, or do other things as needed.
+   recvTimeout.tv_sec = 30;
+   setsockopt(serverSocket, SOL_SOCKET, SO_RCVTIMEO, (char*)&recvTimeout,
+              sizeof(recvTimeout));
+   
 	while (running)
 	{
       //we need to reap the zombie processes at some point; this looks like a
@@ -606,53 +616,66 @@ void RunMainLoop()
 		
 		//clear the buffer
 		memset(buffer, 0, 4096);
-		
-		recv(serverSocket, buffer, 4096, 0);
-		
-		//this will extract who the message is from and store it in messageFrom
-		message = getMessageParts(buffer);
-		
-		if (debugLevel > 1)
-		{
-		   int i = 0;
-		   for (i = 0; i < COMMAND_TOKENS; ++i)
-		   {
-		      if (strlen(message[i]) != 0)
-		         printf("message[%i] = %s\n", i, message[i]);
-		   }
-		}
-		
-		//here's where we process the message
-		if (strcmp(message[2], "PRIVMSG") == 0)
-		{
-		   if (strcmp(message[4], "xdcc") == 0)
-		   {
-		      if (strcmp(message[5], "send") == 0)
-		      {
-               prepareTransfer(message);
-		      }
-		   }
-		   if (strcmp(message[4], "bot") == 0)
-		   {
-		      if (strcmp(message[5], "die") == 0)
-		      {
-		         if (debugLevel > 0)
-		            fprintf(stderr, "Shutting down...\n");
-		         running = 0;
-		      }
-		   }
-		}
-		if (strcmp(message[0], "PING") == 0)
-		{
-		   char tempString[128];
-		   sprintf(tempString, "PONG %s\n", server);
-		   send(serverSocket, tempString, strlen(tempString), 0);
-		   if (debugLevel > 1)
-		      fprintf(stderr, "Responding to ping: %s\n", tempString);
-		}
-		
-		//here's where the message is freed
-		freeMessageParts(message);
+      
+		bytesRecved = recv(serverSocket, buffer, 4096, 0);
+      
+      if (bytesRecved < 0)
+      {
+         //there was a timeout on the recv
+         if (debugLevel > 0)
+            fprintf(stderr, "Recv Timeout!\n");
+      }
+		else if (bytesRecved == 0)
+      {
+         //server closed the socket
+      }
+      else //there was an actual message recived...
+      {
+         //this will extract who the message is from and store it in messageFrom
+         message = getMessageParts(buffer);
+         
+         if (debugLevel > 1)
+         {
+            int i = 0;
+            for (i = 0; i < COMMAND_TOKENS; ++i)
+            {
+               if (strlen(message[i]) != 0)
+                  printf("message[%i] = %s\n", i, message[i]);
+            }
+         }
+         
+         //here's where we process the message
+         if (strcmp(message[2], "PRIVMSG") == 0)
+         {
+            if (strcmp(message[4], "xdcc") == 0)
+            {
+               if (strcmp(message[5], "send") == 0)
+               {
+                  prepareTransfer(message);
+               }
+            }
+            if (strcmp(message[4], "bot") == 0)
+            {
+               if (strcmp(message[5], "die") == 0)
+               {
+                  if (debugLevel > 0)
+                     fprintf(stderr, "Shutting down...\n");
+                  running = 0;
+               }
+            }
+         }
+         if (strcmp(message[0], "PING") == 0)
+         {
+            char tempString[128];
+            sprintf(tempString, "PONG %s\n", server);
+            send(serverSocket, tempString, strlen(tempString), 0);
+            if (debugLevel > 1)
+               fprintf(stderr, "Responding to ping: %s\n", tempString);
+         }
+         
+         //here's where the message is freed
+         freeMessageParts(message);
+      }
 	}
 
 	//if the message is for us we can parse it to see if we're going to send a
