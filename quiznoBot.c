@@ -740,7 +740,7 @@ void RunMainLoop()
          if (strcmp(message[2], "PRIVMSG") == 0)
          {
             //make sure it'sa privmsg for us, not for the channel
-            if (strcmp(message[3], nickname) == 0)
+            if (strcmp(message[3], nick) == 0)
             {
                //see if it's an xdcc request
                if (strcmp(message[4], "xdcc") == 0)
@@ -748,7 +748,9 @@ void RunMainLoop()
                   //do they want a packet?
                   if (strcmp(message[5], "send") == 0)
                   {
-                     prepareTransfer(message);
+                     if (atoi(message[5]) > 0 ||
+                        atoi(message[5]) < numSharedFiles)
+                        prepareTransfer(message);
                   }
                }
                //see if it's a bot request
