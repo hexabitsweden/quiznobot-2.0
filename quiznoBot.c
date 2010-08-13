@@ -121,41 +121,41 @@ void dequeueTransfer()
 
 void printUsage()
 {
-	printf("Usage: %squiznoBot%s [options]\n", TERM_YELLOW_ON_BLACK,
-          TERM_RESET_COLOR);
-	printf("%sOptions:%s\n", TERM_RED_ON_BLACK, TERM_RESET_COLOR);
-	printf("\t%ss %sserver%s - %sSets the server to connect to.%s\n",
-          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
-          TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
-	printf("\t%sc %schannel%s - %sSets the channel to join.%s\n",
-          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
-          TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
-	printf("\t%sn %snick%s - %sSets the bot's nickname.%s\n",
-          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
-          TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
-	printf("\t%sd %sdirectory%s - %sSets the directory the bot scans for files.%s\n",
-          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
-          TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
-	printf("\t%sp %sport%s - %sSets the port to use to connect to the server.%s\n",
-          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
-          TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
-	printf("\t%sv%s - %sIncreases the verbosity level (can be used more",
-          TERM_RED_ON_BLACK, TERM_RESET_COLOR, TERM_GREEN_ON_BLACK);
-	printf(" than once)%s\n\n", TERM_RESET_COLOR);
-	printf("Examples:\n");
-	printf("\t%squiznoBot%s -%ss %sirc.rizon.net%s -%sc %s#eclipse%s -%sn %sMyAwesomeBot%s",
-          TERM_YELLOW_ON_BLACK, TERM_RESET_COLOR,
-          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
-          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
-          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR);
-	printf(" -%sp %s6667%s\n", TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK,
-          TERM_RESET_COLOR);
-	printf("\tConnects to irc.rizon.net on port 6667 joins #eclipse and ");
-	printf("sets\n\tthe nick to MyAwesomeBot\n\n");
-	printf("Defaults:\n");
-	printf("\tBy Default the server is run with the following options:\n");
-	printf("\tquiznoBot -d ./ -s irc.freenode.net -c #ubuntu");
-	printf(" -n IRC_BOT_#### -p 6667\n");
+   printf("Usage: %squiznoBot%s [options]\n", TERM_YELLOW_ON_BLACK,
+         TERM_RESET_COLOR);
+   printf("%sOptions:%s\n", TERM_RED_ON_BLACK, TERM_RESET_COLOR);
+   printf("\t%ss %sserver%s - %sSets the server to connect to.%s\n",
+         TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+         TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
+   printf("\t%sc %schannel%s - %sSets the channel to join.%s\n",
+         TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+         TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
+   printf("\t%sn %snick%s - %sSets the bot's nickname.%s\n",
+         TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+         TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
+   printf("\t%sd %sdirectory%s - %sSets the directory the bot scans for files.%s\n",
+         TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+         TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
+   printf("\t%sp %sport%s - %sSets the port to use to connect to the server.%s\n",
+         TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+         TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
+   printf("\t%sv%s - %sIncreases the verbosity level (can be used more",
+         TERM_RED_ON_BLACK, TERM_RESET_COLOR, TERM_GREEN_ON_BLACK);
+   printf(" than once)%s\n\n", TERM_RESET_COLOR);
+   printf("Examples:\n");
+   printf("\t%squiznoBot%s -%ss %sirc.rizon.net%s -%sc %s#eclipse%s -%sn %sMyAwesomeBot%s",
+         TERM_YELLOW_ON_BLACK, TERM_RESET_COLOR,
+         TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+         TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+         TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR);
+   printf(" -%sp %s6667%s\n", TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK,
+         TERM_RESET_COLOR);
+   printf("\tConnects to irc.rizon.net on port 6667 joins #eclipse and ");
+   printf("sets\n\tthe nick to MyAwesomeBot\n\n");
+   printf("Defaults:\n");
+   printf("\tBy Default the server is run with the following options:\n");
+   printf("\tquiznoBot -d ./ -s irc.freenode.net -c #ubuntu");
+   printf(" -n IRC_BOT_#### -p 6667\n");
 }
 
 void parseCommandline(int argc, char **argv)
@@ -211,14 +211,14 @@ void parseCommandline(int argc, char **argv)
                ++debugLevel;
                fprintf(stderr, "Increasing debug level to: %i\n", debugLevel);
                break;
-				case '?':
-					printUsage();
-					exit(0);
-					break;
-				case 'h':
-					printUsage();
-					exit(0);
-					break;
+            case '?':
+               printUsage();
+               exit(0);
+               break;
+            case 'h':
+               printUsage();
+               exit(0);
+               break;
             default:
                fprintf(stderr, "Unknown option: %c", argv[currentArg][1]);
                break;
@@ -230,7 +230,7 @@ void parseCommandline(int argc, char **argv)
 
 void setDefaults()
 {
-	if ((settings & IRC_PORT_SET) == 0x0) //if the port wasn't set...
+   if ((settings & IRC_PORT_SET) == 0x0) //if the port wasn't set...
    {
       if (debugLevel >= 1)
          fprintf(stderr, "Port not set: defaulting to 6667...\n");
@@ -294,45 +294,45 @@ int IRC_GetServerResponse(char *serverMessage)
 
 int IRC_Connect()
 {
-	struct addrinfo *currentAddress = serverAddress;
-	int connectResult = -1;
-	char ipString[128];
-	
-	if (debugLevel >= 1)
-		fprintf(stderr, "\nConnecting to %s:%s...\n", server, port);
-	
-	memset(&serverAddressHints, 0, sizeof(serverAddressHints));
-	serverAddressHints.ai_family = AF_INET;
-	serverAddressHints.ai_socktype = SOCK_STREAM;
-	if (getaddrinfo(server, port, &serverAddressHints, &serverAddress))
-	{
-		fprintf(stderr, "Error: Could not resolve %s!\n", server);
-		return -1;
-	}
-	currentAddress = serverAddress;
-	while (currentAddress != NULL && (serverSocket == -1 || connectResult == -1))
-	{
-	   if (debugLevel > 1)
-	   {
-	      inet_ntop(currentAddress->ai_family, currentAddress->ai_addr,
-	         ipString, 128);
-	      fprintf(stderr, "Trying: %s...\n", ipString);
-	   }
-		serverSocket = socket(currentAddress->ai_family,
-									 currentAddress->ai_socktype,
-									 currentAddress->ai_protocol);
-		if (serverSocket != -1)
-			connectResult = connect(serverSocket, currentAddress->ai_addr,
-											currentAddress->ai_addrlen);
-			
-		//get the next address
-		currentAddress = currentAddress->ai_next;
-	}
-	if (debugLevel >= 1)
-		fprintf(stderr, "Connected to %s:%s socket num: %08x!\n", server, port,
-				  serverSocket);
+   struct addrinfo *currentAddress = serverAddress;
+   int connectResult = -1;
+   char ipString[128];
    
-	return 0;
+   if (debugLevel >= 1)
+      fprintf(stderr, "\nConnecting to %s:%s...\n", server, port);
+   
+   memset(&serverAddressHints, 0, sizeof(serverAddressHints));
+   serverAddressHints.ai_family = AF_INET;
+   serverAddressHints.ai_socktype = SOCK_STREAM;
+   if (getaddrinfo(server, port, &serverAddressHints, &serverAddress))
+   {
+      fprintf(stderr, "Error: Could not resolve %s!\n", server);
+      return -1;
+   }
+   currentAddress = serverAddress;
+   while (currentAddress != NULL && (serverSocket == -1 || connectResult == -1))
+   {
+      if (debugLevel > 1)
+      {
+         inet_ntop(currentAddress->ai_family, currentAddress->ai_addr,
+            ipString, 128);
+         fprintf(stderr, "Trying: %s...\n", ipString);
+      }
+      serverSocket = socket(currentAddress->ai_family,
+                           currentAddress->ai_socktype,
+                           currentAddress->ai_protocol);
+      if (serverSocket != -1)
+         connectResult = connect(serverSocket, currentAddress->ai_addr,
+                                 currentAddress->ai_addrlen);
+         
+      //get the next address
+      currentAddress = currentAddress->ai_next;
+   }
+   if (debugLevel >= 1)
+      fprintf(stderr, "Connected to %s:%s socket num: %08x!\n", server, port,
+            serverSocket);
+   
+   return 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -428,12 +428,12 @@ int IRC_Disconnect()
    send(serverSocket, QUIT_COMMAND, strlen(QUIT_COMMAND), 0);
    while (recv(serverSocket, buffer, 128, 0) > 0);
    freeaddrinfo(serverAddress);
-	if (close(serverSocket) == -1)
-	{
-		fprintf(stderr, "Couldn't close socket: %i\n", serverSocket);
-		return -1;
-	}
-	return 0;
+   if (close(serverSocket) == -1)
+   {
+      fprintf(stderr, "Couldn't close socket: %i\n", serverSocket);
+      return -1;
+   }
+   return 0;
 }
 
 int IRC_SendMessage(char *toSend)
@@ -631,11 +631,11 @@ void sigchld_handler(int s)
 
 void RunMainLoop()
 {
-	char running = 1;
-	char buffer[4096];
-	char **message;
+   char running = 1;
+   char buffer[4096];
+   char **message;
    struct sigaction sa;
-	struct timeval recvTimeout;
+   struct timeval recvTimeout;
    int bytesRecved = 0;
    time_t nextAnnounce = 0;
    time_t nextAnnounceMessage = 0;
@@ -649,10 +649,10 @@ void RunMainLoop()
    //in the channel, or do other things as needed.
    recvTimeout.tv_sec = 10;
    setsockopt(serverSocket, SOL_SOCKET, SO_RCVTIMEO, (char*)&recvTimeout,
-              sizeof(recvTimeout));
+            sizeof(recvTimeout));
    
-	while (running)
-	{
+   while (running)
+   {
       //we need to reap the zombie processes at some point; this looks like a
       //good place to do it...
       sa.sa_handler = sigchld_handler;
@@ -664,13 +664,13 @@ void RunMainLoop()
          exit(1);
       }
       
-		//first thing we need to do is read in the input and check if it's a
+      //first thing we need to do is read in the input and check if it's a
       //private message for us.
-		
-		//clear the buffer
-		memset(buffer, 0, 4096);
       
-		bytesRecved = recv(serverSocket, buffer, 4096, 0);
+      //clear the buffer
+      memset(buffer, 0, 4096);
+      
+      bytesRecved = recv(serverSocket, buffer, 4096, 0);
       
       //we don't care if we timed out or if we actually got some text from
       //the server to check if we're doing an announce...
@@ -692,8 +692,8 @@ void RunMainLoop()
          {
             nextAnnounceMessage += 2;
             sprintf(announceString, "PRIVMSG %s :\0034,1#\002%i\002 - %s\n", channel, 
-                    nextPackToAnnounce,
-                    dirContents[nextPackToAnnounce].filename);
+                  nextPackToAnnounce,
+                  dirContents[nextPackToAnnounce].filename);
             ++nextPackToAnnounce;
             IRC_SendMessage(announceString);
          }
@@ -717,7 +717,7 @@ void RunMainLoop()
          if (debugLevel > 1)
             fprintf(stderr, "Recv Timeout!\n");
       }
-		else if (bytesRecved == 0)
+      else if (bytesRecved == 0)
       {
          //server closed the socket
       }
@@ -776,57 +776,57 @@ void RunMainLoop()
          //here's where the message is freed
          freeMessageParts(message);
       }
-	}
+   }
 
-	//if the message is for us we can parse it to see if we're going to send a
-	//file (and which file to send).
-	//sample:
-	//:quizno50!~quizno50@157.201.73.134 PRIVMSG quizno_50 :xdcc send #111
-	
-	//once we know what we're going to send and everything we need to send this
-	//to the IRC server: (filename should have no spaces)
-	//Looks like IP is going to be some weird format, my guess is the integer
-	//that is represented by the number-and-dots representation. (confirmed)
-	//PRIVMSG [clientNick] :DCC SEND [filename] [ip] [port] [filesize]
-	
-	//here is a sample DCC SEND request (receving side):
-	//:quizno50!~quizno50@403E9AD6.A12536E4.577914A5.IP PRIVMSG quizno_50 :DCC SEND bruteForceTest.c 16843009 0 2583 1 T
-	
-	//now we need to fork the process and run the following only in the forked
-	//process:
-	//we need to do some more research into the IRC DCC protocol, but here's
-	//where we would setup a socket to listen for the client to connect.
-	//once the client has connected; start sending the file following the
-	//protocol's specification.
+   //if the message is for us we can parse it to see if we're going to send a
+   //file (and which file to send).
+   //sample:
+   //:quizno50!~quizno50@157.201.73.134 PRIVMSG quizno_50 :xdcc send #111
+   
+   //once we know what we're going to send and everything we need to send this
+   //to the IRC server: (filename should have no spaces)
+   //Looks like IP is going to be some weird format, my guess is the integer
+   //that is represented by the number-and-dots representation. (confirmed)
+   //PRIVMSG [clientNick] :DCC SEND [filename] [ip] [port] [filesize]
+   
+   //here is a sample DCC SEND request (receving side):
+   //:quizno50!~quizno50@403E9AD6.A12536E4.577914A5.IP PRIVMSG quizno_50 :DCC SEND bruteForceTest.c 16843009 0 2583 1 T
+   
+   //now we need to fork the process and run the following only in the forked
+   //process:
+   //we need to do some more research into the IRC DCC protocol, but here's
+   //where we would setup a socket to listen for the client to connect.
+   //once the client has connected; start sending the file following the
+   //protocol's specification.
 }
 
 int main(int argc, char **argv)
 {
-	//setup from the commandline
+   //setup from the commandline
    parseCommandline(argc, argv);
    
-	//seed the random number generator
+   //seed the random number generator
    srand(time(NULL));
-	
-	//set defaults for values not set
-	setDefaults();
+   
+   //set defaults for values not set
+   setDefaults();
    
    //scan the directory for files to share
    DIR_Scan();
-	
+   
    //connect to the server
-	IRC_Connect();
+   IRC_Connect();
    
    //login to the server
    IRC_Login();
-	
-	//Here's where we need to make the main loop. A multi processing solution
-	//would be awesome (something like having a forked process to send files for
-	//each connected client.
-	RunMainLoop();
-	
+   
+   //Here's where we need to make the main loop. A multi processing solution
+   //would be awesome (something like having a forked process to send files for
+   //each connected client.
+   RunMainLoop();
+   
    //disconnect from the server
-	IRC_Disconnect();
+   IRC_Disconnect();
    
    return 0;
 }
