@@ -19,7 +19,7 @@
 /////////////////////////////////////////////////////////////////////////////
 //  Instructions:
 //    The bot is very simple to use:
-//      ircBot -n [nick] -c [channel] -s [server] -p [port] -d [dir] (-v)(-v)
+//      quiznoBot -n [nick] -c [channel] -s [server] -p [port] -d [dir] (-v)(-v)
 //    The options work as follows:
 //      -n [nick] -- Specify the name of the bot on the IRC network.
 //      -c [channel] -- specify the channel the bot will join.
@@ -50,6 +50,12 @@
 #define DEFAULT_TIMEOUT 10
 #define COMMAND_TOKENS 500
 
+#define TERM_BLUE_ON_BLACK "\e[36;40m"
+#define TERM_GREEN_ON_BLACK "\e[32;40m"
+#define TERM_RED_ON_BLACK "\e[31;40m"
+#define TERM_YELLOW_ON_BLACK "\e[35;40m"
+#define TERM_RESET_COLOR "\e[0m"
+
 enum CommandLineSettings
 {
    IRC_CHANNEL_SET = 0x1,
@@ -75,7 +81,7 @@ struct TransferRequest transferQueue[100];
 int transferQueueFront = 0;
 int transferQueueBack = 0;
 
-const char* QUIT_COMMAND = "QUIT :ircBot http://quizno50.x10hosting.com\n";
+const char* QUIT_COMMAND = "QUIT :quiznoBot http://quizno50.x10hosting.com\n";
 
 int sharedFileArraySize = 0;
 int numSharedFiles = 0;
@@ -96,6 +102,9 @@ char userCommandSent = 0;
 char nickCommandSent = 0;
 char joinCommandSent = 0;
 
+int transferPort = 41000;
+char transferPortString[10];
+
 int enqueueTransfer(int filenumber, char* nick)
 {
    ++transferQueueBack;
@@ -112,23 +121,40 @@ void dequeueTransfer()
 
 void printUsage()
 {
-	printf("Usage: ircBot [options]\n");
-	printf("Options:\n");
-	printf("\ts server - Sets the server to connect to.\n");
-	printf("\tc channel - Sets the channel to join.\n");
-	printf("\tn nick - Sets the bot's nickname.\n");
-	printf("\td directory - Sets the directory the bot scans for files.\n");
-	printf("\tp port - Sets the port to use to connect to the server.\n");
-	printf("\tv - Increases the verbosity level (can be used more");
-	printf("than once)\n\n");
+	printf("Usage: %squiznoBot%s [options]\n", TERM_YELLOW_ON_BLACK,
+          TERM_RESET_COLOR);
+	printf("%sOptions:%s\n", TERM_RED_ON_BLACK, TERM_RESET_COLOR);
+	printf("\t%ss %sserver%s - %sSets the server to connect to.%s\n",
+          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+          TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
+	printf("\t%sc %schannel%s - %sSets the channel to join.%s\n",
+          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+          TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
+	printf("\t%sn %snick%s - %sSets the bot's nickname.%s\n",
+          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+          TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
+	printf("\t%sd %sdirectory%s - %sSets the directory the bot scans for files.%s\n",
+          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+          TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
+	printf("\t%sp %sport%s - %sSets the port to use to connect to the server.%s\n",
+          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+          TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
+	printf("\t%sv%s - %sIncreases the verbosity level (can be used more",
+          TERM_RED_ON_BLACK, TERM_RESET_COLOR, TERM_GREEN_ON_BLACK);
+	printf(" than once)%s\n\n", TERM_RESET_COLOR);
 	printf("Examples:\n");
-	printf("\tircBot -s irc.rizon.net -c #eclipse -n MyAwesomeBot");
-	printf("-p 6667\n");
-	printf("\tConnects to irc.rizon.net on port 6667 joins #eclipse and");
+	printf("\t%squiznoBot%s -%ss %sirc.rizon.net%s -%sc %s#eclipse%s -%sn %sMyAwesomeBot%s",
+          TERM_YELLOW_ON_BLACK, TERM_RESET_COLOR,
+          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+          TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR);
+	printf(" -%sp %s6667%s\n", TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK,
+          TERM_RESET_COLOR);
+	printf("\tConnects to irc.rizon.net on port 6667 joins #eclipse and ");
 	printf("sets\n\tthe nick to MyAwesomeBot\n\n");
 	printf("Defaults:\n");
 	printf("\tBy Default the server is run with the following options:\n");
-	printf("\tircBot -d ./ -s irc.freenode.net -c #ubuntu");
+	printf("\tquiznoBot -d ./ -s irc.freenode.net -c #ubuntu");
 	printf(" -n IRC_BOT_#### -p 6667\n");
 }
 
@@ -309,13 +335,24 @@ int IRC_Connect()
 	return 0;
 }
 
-void IRC_CheckEndOfMOTD()
+/////////////////////////////////////////////////////////////////////////////
+// This function has been ripped apart because the code that's commented out
+// didn't want to work on some servers. So I commented it out and just put
+// a sleep in there so it'd wait a few seconds before trying to login to the
+// server...
+/////////////////////////////////////////////////////////////////////////////
+void IRC_WaitEndOfMOTD()
 {
+   /*
    char buffer[4096];
    int bufferPos = 0;
    char temp[6];
    int end = 0;
+   */
    
+   sleep(3);
+   
+   /*
    memset(buffer, 0, 4096);
    while (end == 0)
    {
@@ -336,6 +373,7 @@ void IRC_CheckEndOfMOTD()
          ++bufferPos;
       }
    }
+   */
 }
 
 int IRC_Login()
@@ -365,7 +403,7 @@ int IRC_Login()
    
    if (debugLevel > 0)
       fprintf(stderr, "Listening 'till end of MOTD...");
-   IRC_CheckEndOfMOTD();
+   IRC_WaitEndOfMOTD();
    if (debugLevel > 0)
       fprintf(stderr, "done...\n");
    
@@ -396,6 +434,11 @@ int IRC_Disconnect()
 		return -1;
 	}
 	return 0;
+}
+
+int IRC_SendMessage(char *toSend)
+{
+   return send(serverSocket, toSend, strlen(toSend), 0);
 }
 
 void DIR_Scan()
@@ -517,6 +560,9 @@ void prepareTransfer(char **message)
    else if (forkId == 0) //child process
    {
       //moved from mainLoop function
+      srand(time(NULL));
+      transferPort = rand() % 50 + transferPort;
+      sprintf(transferPortString, "%d", transferPort);
       struct sockaddr_in myself;
       socklen_t addrSize = sizeof(struct sockaddr_in);
       int packNumber = atoi(message[6] + 1);
@@ -528,7 +574,7 @@ void prepareTransfer(char **message)
       hints.ai_family = AF_UNSPEC;
       hints.ai_socktype = SOCK_STREAM;
       hints.ai_flags = AI_PASSIVE;
-      getaddrinfo(NULL, "41000", &hints, &myAddress);
+      getaddrinfo(NULL, transferPortString, &hints, &myAddress);
       listenSocket = socket(myAddress->ai_family, myAddress->ai_socktype,
                               myAddress->ai_protocol);
       if (debugLevel > 0) fprintf(stderr, "Binding...");
@@ -538,14 +584,14 @@ void prepareTransfer(char **message)
       sendBuffer = calloc(sizeof(char), 1024);
       
       if (debugLevel > 0)
-         fprintf(stderr, "Sending pack #%i to %s\n", 
-            atoi(message[6] + 1), message[0]);
+         fprintf(stderr, "Sending pack #%i to %s on port %i\n", 
+            atoi(message[6] + 1), message[0], transferPort);
       
       getsockname(serverSocket, (struct sockaddr*)&myself, &addrSize);
       
-      sprintf(sendBuffer, "PRIVMSG %s :\001DCC SEND %s %i %i %li\001\n",
+      sprintf(sendBuffer, "PRIVMSG %s :\001DCC SEND \"%s\" %i %i %li\001\n",
          message[0], dirContents[atoi(message[6] + 1)].filename, 
-         ntohl(myself.sin_addr.s_addr), 41000,
+         ntohl(myself.sin_addr.s_addr), transferPort,
          dirContents[atoi(message[6] + 1)].filesize);
       send(serverSocket, sendBuffer, strlen(sendBuffer), 0);
       //end move
@@ -572,6 +618,8 @@ void prepareTransfer(char **message)
          recv(transferSocket, inputBuffer, 128, 0);
          filePosition = ftell(toTransfer);
       }
+      close(listenSocket);
+      close(transferSocket);
       _exit(0);
    }
 }
@@ -589,12 +637,17 @@ void RunMainLoop()
    struct sigaction sa;
 	struct timeval recvTimeout;
    int bytesRecved = 0;
+   time_t nextAnnounce = 0;
+   time_t nextAnnounceMessage = 0;
+   char doingAnnounce = 0;
+   int nextPackToAnnounce = 0;
+   char* announceString = 0x0;
    
    //clear out the recvTimeout struct
    memset(&recvTimeout, 0, sizeof(struct timeval));
-   //we'll timeout every 30 seconds so we can run thruogh the loop to announce
+   //we'll timeout every 10 seconds so we can run thruogh the loop to announce
    //in the channel, or do other things as needed.
-   recvTimeout.tv_sec = 30;
+   recvTimeout.tv_sec = 10;
    setsockopt(serverSocket, SOL_SOCKET, SO_RCVTIMEO, (char*)&recvTimeout,
               sizeof(recvTimeout));
    
@@ -619,10 +672,49 @@ void RunMainLoop()
       
 		bytesRecved = recv(serverSocket, buffer, 4096, 0);
       
+      //we don't care if we timed out or if we actually got some text from
+      //the server to check if we're doing an announce...
+      if (time(NULL) >= nextAnnounce)
+      {
+         doingAnnounce = 1;
+         //next line is just to keep it from coming here again
+         nextAnnounce = time(NULL) + 50000; 
+         announceString = calloc(sizeof(char), 2048);
+         if (debugLevel > 0) fprintf(stderr, "Doing announce!\n");
+      }
+      if (doingAnnounce)
+      {
+         //we need to reset the timeout to a lower value (only a couple seconds)
+         recvTimeout.tv_sec = 2;
+         setsockopt(serverSocket, SOL_SOCKET, SO_RCVTIMEO,
+                     (char*)&recvTimeout, sizeof(recvTimeout));
+         if (time(NULL) > nextAnnounceMessage)
+         {
+            nextAnnounceMessage += 2;
+            sprintf(announceString, "PRIVMSG %s :\0034,1#\002%i\002 - %s\n", channel, 
+                    nextPackToAnnounce,
+                    dirContents[nextPackToAnnounce].filename);
+            ++nextPackToAnnounce;
+            IRC_SendMessage(announceString);
+         }
+         if (nextPackToAnnounce >= numSharedFiles)
+         {
+            nextPackToAnnounce = 0;
+            doingAnnounce = 0;
+            nextAnnounce = time(NULL) + 90; //next announce in 90 seconds
+            nextAnnounceMessage = time(NULL) + 92;
+            free(announceString);
+            //restore original timeout
+            recvTimeout.tv_sec = 10;
+            setsockopt(serverSocket, SOL_SOCKET, SO_RCVTIMEO,
+                        (char*)&recvTimeout, sizeof(recvTimeout));
+         }
+      }
+      
       if (bytesRecved < 0)
       {
          //there was a timeout on the recv
-         if (debugLevel > 0)
+         if (debugLevel > 1)
             fprintf(stderr, "Recv Timeout!\n");
       }
 		else if (bytesRecved == 0)
@@ -631,7 +723,7 @@ void RunMainLoop()
       }
       else //there was an actual message recived...
       {
-         //this will extract who the message is from and store it in messageFrom
+         //this will divide up the message into parts...
          message = getMessageParts(buffer);
          
          if (debugLevel > 1)
@@ -647,20 +739,28 @@ void RunMainLoop()
          //here's where we process the message
          if (strcmp(message[2], "PRIVMSG") == 0)
          {
-            if (strcmp(message[4], "xdcc") == 0)
+            //make sure it'sa privmsg for us, not for the channel
+            if (strcmp(message[3], nickname) == 0)
             {
-               if (strcmp(message[5], "send") == 0)
+               //see if it's an xdcc request
+               if (strcmp(message[4], "xdcc") == 0)
                {
-                  prepareTransfer(message);
+                  //do they want a packet?
+                  if (strcmp(message[5], "send") == 0)
+                  {
+                     prepareTransfer(message);
+                  }
                }
-            }
-            if (strcmp(message[4], "bot") == 0)
-            {
-               if (strcmp(message[5], "die") == 0)
+               //see if it's a bot request
+               if (strcmp(message[4], "bot") == 0)
                {
-                  if (debugLevel > 0)
-                     fprintf(stderr, "Shutting down...\n");
-                  running = 0;
+                  //do they want me to die?
+                  if (strcmp(message[5], "die") == 0)
+                  {
+                     if (debugLevel > 0)
+                        fprintf(stderr, "Shutting down...\n");
+                     running = 0;
+                  }
                }
             }
          }
@@ -691,9 +791,6 @@ void RunMainLoop()
 	
 	//here is a sample DCC SEND request (receving side):
 	//:quizno50!~quizno50@403E9AD6.A12536E4.577914A5.IP PRIVMSG quizno_50 :DCC SEND bruteForceTest.c 16843009 0 2583 1 T
-	
-	//at this point we're looking for a DCC RESUME response (to set file
-	//position), or a DCC ACCEPT
 	
 	//now we need to fork the process and run the following only in the forked
 	//process:
