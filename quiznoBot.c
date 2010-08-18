@@ -286,9 +286,7 @@ void setDefaults()
       hints.ai_family = AF_INET;
       hints.ai_flags = AI_PASSIVE;
       getaddrinfo(NULL, "7666", &hints, &myAddress);
-      inet_ntop(myAddress->ai_family,
-         &(((struct sockaddr_in*)myAddress->ai_addr)->sin_addr),
-         externalIP, 20);
+      inet_ntop(AF_INET, 
    }
 }
 
