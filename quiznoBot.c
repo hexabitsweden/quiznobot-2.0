@@ -62,7 +62,8 @@ enum CommandLineSettings
    IRC_SERVER_SET = 0x2,
    IRC_NICK_SET = 0x4,
    BOT_DIRECTORY_SET = 0x8,
-   IRC_PORT_SET = 0x10
+   IRC_PORT_SET = 0x10,
+   IRC_EXTERNAL_IP_SET = 0x20
 } settings;
 
 struct SharedFile
@@ -91,11 +92,13 @@ char nick[128];
 char server[128];
 char directory[512];
 char port[10];
+char externalIP[20];
 
 int debugLevel = 0;
 
 struct addrinfo *serverAddress;
 struct addrinfo serverAddressHints;
+struct addrinfo *myAddress;
 int serverSocket = -1;
 
 char userCommandSent = 0;
@@ -141,7 +144,11 @@ void printUsage()
          TERM_GREEN_ON_BLACK, TERM_RESET_COLOR);
    printf("\t%sv%s - %sIncreases the verbosity level (can be used more",
          TERM_RED_ON_BLACK, TERM_RESET_COLOR, TERM_GREEN_ON_BLACK);
-   printf(" than once)%s\n\n", TERM_RESET_COLOR);
+   printf(" than once)%s\n", TERM_RESET_COLOR);
+   printf("\t%se %sip%s - %sSets the IP the bot will send for all",
+         TERM_RED_ON_BLACK, TERM_BLUE_ON_BLACK, TERM_RESET_COLOR,
+         TERM_GREEN_ON_BLACK);
+   printf("file transfers.%s\n\n", TERM_RESET_COLOR);
    printf("Examples:\n");
    printf("\t%squiznoBot%s -%ss %sirc.rizon.net%s -%sc %s#eclipse%s -%sn %sMyAwesomeBot%s",
          TERM_YELLOW_ON_BLACK, TERM_RESET_COLOR,
@@ -219,6 +226,11 @@ void parseCommandline(int argc, char **argv)
                printUsage();
                exit(0);
                break;
+            case 'e':
+               strcpy(externalIP, argv[currentArg + 1]);
+               ++currentArg;
+               settings |= IRC_EXTERNAL_IP_SET;
+               break;
             default:
                fprintf(stderr, "Unknown option: %c", argv[currentArg][1]);
                break;
@@ -263,6 +275,20 @@ void setDefaults()
       strcpy(channel, "#ubuntu");
       if (debugLevel >= 1)
          fprintf(stderr, "Channel not set: defaulting to %s\n", channel);
+   }
+   
+   if ((settings & IRC_EXTERNAL_IP_SET) == 0x0) //if the external ip isn't set
+   {
+      struct addrinfo *myAddress;
+      struct addrinfo hints;
+      memset(&hints, 0x0, sizeof(hints));
+      hints.ai_socktype = SOCK_STREAM;
+      hints.ai_family = AF_INET;
+      hints.ai_flags = AI_PASSIVE;
+      getaddrinfo(NULL, "7666", &hints, &myAddress);
+      inet_ntop(myAddress->ai_family,
+         &(((struct sockaddr_in*)myAddress->ai_addr)->sin_addr),
+         externalIP, 20);
    }
 }
 
@@ -543,7 +569,6 @@ void prepareTransfer(char **message)
    int transferSocket = 0;
    size_t filePosition = 0;
    FILE *toTransfer;
-   struct addrinfo *myAddress;
    struct addrinfo hints;
    struct sockaddr connectedAddr;
    struct sockaddr_storage theirAddr;
@@ -564,7 +589,7 @@ void prepareTransfer(char **message)
       transferPort = rand() % 50 + transferPort;
       sprintf(transferPortString, "%d", transferPort);
       struct sockaddr_in myself;
-      socklen_t addrSize = sizeof(struct sockaddr_in);
+      //socklen_t addrSize = sizeof(struct sockaddr_in);
       int packNumber = atoi(message[6] + 1);
       char *sendBuffer;
 
@@ -587,7 +612,10 @@ void prepareTransfer(char **message)
          fprintf(stderr, "Sending pack #%i to %s on port %i\n", 
             atoi(message[6] + 1), message[0], transferPort);
       
-      getsockname(serverSocket, (struct sockaddr*)&myself, &addrSize);
+      //commented out to test the inet_aton call
+      //getsockname(serverSocket, (struct sockaddr*)&myself, &addrSize);
+      inet_aton(externalIP, (struct in_addr*)&myself);
+      
       
       sprintf(sendBuffer, "PRIVMSG %s :\001DCC SEND \"%s\" %i %i %li\001\n",
          message[0], dirContents[atoi(message[6] + 1)].filename, 
