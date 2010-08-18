@@ -584,11 +584,11 @@ void prepareTransfer(char **message)
    }
    else if (forkId == 0) //child process
    {
+      struct in_addr myself;
       //moved from mainLoop function
       srand(time(NULL));
       transferPort = rand() % 50 + transferPort;
       sprintf(transferPortString, "%d", transferPort);
-      struct sockaddr_in myself;
       //socklen_t addrSize = sizeof(struct sockaddr_in);
       int packNumber = atoi(message[6] + 1);
       char *sendBuffer;
@@ -607,19 +607,19 @@ void prepareTransfer(char **message)
       if (debugLevel > 0) fprintf(stderr, "done!\n");
       //moved from main loop function..
       sendBuffer = calloc(sizeof(char), 1024);
-      
-      if (debugLevel > 0)
-         fprintf(stderr, "Sending pack #%i to %s on port %i\n", 
-            atoi(message[6] + 1), message[0], transferPort);
-      
+
       //commented out to test the inet_aton call
       //getsockname(serverSocket, (struct sockaddr*)&myself, &addrSize);
-      inet_aton(externalIP, (struct in_addr*)&myself);
+      inet_aton(externalIP, &myself);
       
+      if (debugLevel > 0)
+         fprintf(stderr, "Sending pack #%i to %s on %s(%d) port %i\n",
+                 atoi(message[6] + 1), message[0], externalIP,
+                 htonl(myself.s_addr), transferPort);
       
       sprintf(sendBuffer, "PRIVMSG %s :\001DCC SEND \"%s\" %i %i %li\001\n",
          message[0], dirContents[atoi(message[6] + 1)].filename, 
-         ntohl(myself.sin_addr.s_addr), transferPort,
+         htonl(myself.s_addr), transferPort,
          dirContents[atoi(message[6] + 1)].filesize);
       send(serverSocket, sendBuffer, strlen(sendBuffer), 0);
       //end move
