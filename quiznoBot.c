@@ -279,14 +279,22 @@ void setDefaults()
    
    if ((settings & IRC_EXTERNAL_IP_SET) == 0x0) //if the external ip isn't set
    {
-      struct addrinfo *myAddress;
+      struct addrinfo *myAddressInfo;
       struct addrinfo hints;
+      struct sockaddr_in *myAddress;
       memset(&hints, 0x0, sizeof(hints));
       hints.ai_socktype = SOCK_STREAM;
       hints.ai_family = AF_INET;
       hints.ai_flags = AI_PASSIVE;
-      getaddrinfo(NULL, "7666", &hints, &myAddress);
-      inet_ntop(AF_INET, 
+      getaddrinfo(NULL, "6667", &hints, &myAddressInfo);
+      myAddress = (struct sockaddr_in*)myAddressInfo->ai_addr;
+      inet_ntop(AF_INET, &(myAddress->sin_addr.s_addr), externalIP,
+                sizeof(struct in_addr));
+      if (debugLevel > 0)
+      {
+         fprintf(stderr, "External IP not specified: defaulting to: %s\n",
+                 externalIP);
+      }
    }
 }
 
