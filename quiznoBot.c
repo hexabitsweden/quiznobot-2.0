@@ -82,7 +82,7 @@ struct TransferRequest transferQueue[100];
 int transferQueueFront = 0;
 int transferQueueBack = 0;
 
-const char* QUIT_COMMAND = "QUIT :quiznoBot http://quizno50.x10hosting.com\n";
+const char* QUIT_COMMAND = "QUIT :quiznoBot http://quizno50.x10hosting.com\r\n";
 
 int sharedFileArraySize = 0;
 int numSharedFiles = 0;
@@ -161,7 +161,7 @@ void printUsage()
    printf("sets\n\tthe nick to MyAwesomeBot\n\n");
    printf("Defaults:\n");
    printf("\tBy Default the server is run with the following options:\n");
-   printf("\tquiznoBot -d ./ -s irc.freenode.net -c #ubuntu");
+   printf("\tquiznoBot -d ./ -s irc.zesty-irc.net -c #bottest");
    printf(" -n IRC_BOT_#### -p 6667\n");
 }
 
@@ -252,8 +252,8 @@ void setDefaults()
    if ((settings & IRC_SERVER_SET) == 0x0) //if the server wasn't set
    {
       if (debugLevel >= 1)
-         fprintf(stderr, "Server not set: defaulting to irc.freenode.net\n");
-      strcpy(server, "irc.freenode.net");
+         fprintf(stderr, "Server not set: defaulting to irc.zesty-irc.net\n");
+      strcpy(server, "irc.zesty-irc.net");
    }
    
    if ((settings & IRC_NICK_SET) == 0x0) //if the nick wasn't set
@@ -272,29 +272,9 @@ void setDefaults()
    
    if ((settings & IRC_CHANNEL_SET) == 0x0) //if the channel wasn't set
    {
-      strcpy(channel, "#ubuntu");
+      strcpy(channel, "#bottest");
       if (debugLevel >= 1)
          fprintf(stderr, "Channel not set: defaulting to %s\n", channel);
-   }
-   
-   if ((settings & IRC_EXTERNAL_IP_SET) == 0x0) //if the external ip isn't set
-   {
-      struct addrinfo *myAddressInfo;
-      struct addrinfo hints;
-      struct sockaddr_in *myAddress;
-      memset(&hints, 0x0, sizeof(hints));
-      hints.ai_socktype = SOCK_STREAM;
-      hints.ai_family = AF_INET;
-      hints.ai_flags = AI_PASSIVE;
-      getaddrinfo(NULL, "6667", &hints, &myAddressInfo);
-      myAddress = (struct sockaddr_in*)myAddressInfo->ai_addr;
-      inet_ntop(AF_INET, &(myAddress->sin_addr.s_addr), externalIP,
-                sizeof(struct in_addr));
-      if (debugLevel > 0)
-      {
-         fprintf(stderr, "External IP not specified: defaulting to: %s\n",
-                 externalIP);
-      }
    }
 }
 
@@ -363,7 +343,7 @@ int IRC_Connect()
    if (debugLevel >= 1)
       fprintf(stderr, "Connected to %s:%s socket num: %08x!\n", server, port,
             serverSocket);
-   
+
    return 0;
 }
 
@@ -454,11 +434,10 @@ int IRC_Login()
 
 int IRC_Disconnect()
 {
-   char buffer[128];
    if (debugLevel >= 1)
       fprintf(stderr, "Diconnecting from server...\n");
    send(serverSocket, QUIT_COMMAND, strlen(QUIT_COMMAND), 0);
-   while (recv(serverSocket, buffer, 128, 0) > 0);
+   sleep(2);
    freeaddrinfo(serverAddress);
    if (close(serverSocket) == -1)
    {
@@ -614,8 +593,20 @@ void prepareTransfer(char **message)
       //moved from main loop function..
       sendBuffer = calloc(sizeof(char), 1024);
 
-      //commented out to test the inet_aton call
-      //getsockname(serverSocket, (struct sockaddr*)&myself, &addrSize);
+      //this would be a good spot to fill in the externalIP string
+      if ((settings & IRC_EXTERNAL_IP_SET) == 0)
+      {
+         struct sockaddr myselfSockAddr;
+         socklen_t myselfSockAddrLen = 32;
+         if (getsockname(serverSocket, &myselfSockAddr,
+                     &myselfSockAddrLen) == 0)
+         {
+            inet_ntop(AF_INET,
+                   &(((struct sockaddr_in*)&myselfSockAddr)->sin_addr),
+                   externalIP, 20);
+         }
+      }
+      
       inet_aton(externalIP, &myself);
       
       if (debugLevel > 0)
