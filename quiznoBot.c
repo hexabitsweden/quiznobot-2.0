@@ -28,6 +28,9 @@
 //      -d [dir] -- specify the directory the server will share.
 //      -v -- increase the debug level (amount of information printed to the
 //            user, one should be plenty for admins, two is good for developers
+//      -e [ip] -- Sets the external IP in case the bot is behind a firewall
+//                 or NAT and cannot receive incomming connections on its 
+//                 network adapter's IP address.
 /////////////////////////////////////////////////////////////////////////////
 
 #include <stdio.h>
@@ -616,7 +619,7 @@ void prepareTransfer(char **message)
       
       sprintf(sendBuffer, "PRIVMSG %s :\001DCC SEND \"%s\" %i %i %li\001\n",
          message[0], dirContents[atoi(message[6] + 1)].filename, 
-         htonl(myself.s_addr), transferPort,
+         (unsigned int)htonl(myself.s_addr), transferPort,
          dirContents[atoi(message[6] + 1)].filesize);
       send(serverSocket, sendBuffer, strlen(sendBuffer), 0);
       //end move
@@ -626,7 +629,7 @@ void prepareTransfer(char **message)
                               &theirAddrSize);
       if (debugLevel > 0) fprintf(stderr, "got socket: %d\n", transferSocket);
       //now we have the socket; now we can send them the data...
-      buffer = calloc(512, sizeof(char));
+      buffer = calloc(4096, sizeof(char));
       inputBuffer = calloc(128, sizeof(char));
       fileToOpen = calloc(sizeof(char), 128);
       sprintf(fileToOpen, "%s/%s", directory, dirContents[packNumber].filename);
@@ -638,8 +641,8 @@ void prepareTransfer(char **message)
       }
       while (filePosition < dirContents[packNumber].filesize)
       {
-         fread(buffer, sizeof(char), 512, toTransfer);
-         send(transferSocket, buffer, 512, 0);
+         fread(buffer, sizeof(char), 4096, toTransfer);
+         send(transferSocket, buffer, 4096, 0);
          recv(transferSocket, inputBuffer, 128, 0);
          filePosition = ftell(toTransfer);
       }
