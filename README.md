@@ -12,7 +12,9 @@ Big thanks to the original developer quizno50@gmail.com!
 Hexabit rescued this project from Google Code.
 
 ## Instructions:
-    The bot is very simple to use:
+
+The bot is very simple to use:
+
 ```
 quiznoBot -n [nick] -c [channel] -s [server] -p [port] -d [dir] (-v)(-v)
 ```
