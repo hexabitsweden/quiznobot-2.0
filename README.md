@@ -11,19 +11,22 @@ Big thanks to the original developer quizno50@gmail.com!
 
 Hexabit rescued this project from Google Code.
 
-/////////////////////////////////////////////////////////////////////////////
-//  Instructions:
-//    The bot is very simple to use:
-//      quiznoBot -n [nick] -c [channel] -s [server] -p [port] -d [dir] (-v)(-v)
-//    The options work as follows:
-//      -n [nick] -- Specify the name of the bot on the IRC network.
-//      -c [channel] -- specify the channel the bot will join.
-//      -s [server] -- specify the server the bot will join (IPV4 only please)
-//      -p [port] -- specify the port the server will use
-//      -d [dir] -- specify the directory the server will share.
-//      -v -- increase the debug level (amount of information printed to the
-//            user, one should be plenty for admins, two is good for developers
-//      -e [ip] -- Sets the external IP in case the bot is behind a firewall
-//                 or NAT and cannot receive incomming connections on its 
-//                 network adapter's IP address.
-/////////////////////////////////////////////////////////////////////////////
+## Instructions:
+    The bot is very simple to use:
+```
+quiznoBot -n [nick] -c [channel] -s [server] -p [port] -d [dir] (-v)(-v)
+```
+
+## The options work as follows:
+```
+      -n [nick] -- Specify the name of the bot on the IRC network.
+      -c [channel] -- specify the channel the bot will join.
+      -s [server] -- specify the server the bot will join (IPV4 only please)
+      -p [port] -- specify the port the server will use
+      -d [dir] -- specify the directory the server will share.
+      -v -- increase the debug level (amount of information printed to the
+             user, one should be plenty for admins, two is good for developers
+      -e [ip] -- Sets the external IP in case the bot is behind a firewall
+                 or NAT and cannot receive incomming connections on its 
+                 network adapter's IP address.
+```
