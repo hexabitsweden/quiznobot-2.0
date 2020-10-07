@@ -85,7 +85,7 @@ struct TransferRequest transferQueue[100];
 int transferQueueFront = 0;
 int transferQueueBack = 0;
 
-const char* QUIT_COMMAND = "QUIT :quiznoBot http://quizno50.x10hosting.com\r\n";
+const char* QUIT_COMMAND = "QUIT :quiznoBot http://blog.codeland.se\r\n";
 
 int sharedFileArraySize = 0;
 int numSharedFiles = 0;
@@ -255,8 +255,8 @@ void setDefaults()
    if ((settings & IRC_SERVER_SET) == 0x0) //if the server wasn't set
    {
       if (debugLevel >= 1)
-         fprintf(stderr, "Server not set: defaulting to irc.zesty-irc.net\n");
-      strcpy(server, "irc.zesty-irc.net");
+         fprintf(stderr, "Server not set: defaulting to irc.freenode.net\n");
+      strcpy(server, "irc.freenode.net");
    }
    
    if ((settings & IRC_NICK_SET) == 0x0) //if the nick wasn't set
