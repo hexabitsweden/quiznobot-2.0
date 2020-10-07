@@ -164,7 +164,7 @@ void printUsage()
    printf("sets\n\tthe nick to MyAwesomeBot\n\n");
    printf("Defaults:\n");
    printf("\tBy Default the server is run with the following options:\n");
-   printf("\tquiznoBot -d ./ -s irc.zesty-irc.net -c #bottest");
+   printf("\tquiznoBot -d ./ -s irc.freenode.net -c #bottest");
    printf(" -n IRC_BOT_#### -p 6667\n");
 }
 
@@ -730,7 +730,10 @@ void RunMainLoop()
             nextPackToAnnounce = 0;
             doingAnnounce = 0;
             nextAnnounce = time(NULL) + 90; //next announce in 90 seconds
-            nextAnnounceMessage = time(NULL) + 92;
+
+	    /* We need to fix the spaming in channels. Too much listings.. */
+            
+	    nextAnnounceMessage = time(NULL) + 92;
             free(announceString);
             //restore original timeout
             recvTimeout.tv_sec = 10;
